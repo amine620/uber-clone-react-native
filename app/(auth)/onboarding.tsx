@@ -1,16 +1,65 @@
-import { Text, View } from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
+import { router } from "expo-router";
+import Swiper from "react-native-swiper";
+import { useRef, useState } from "react";
+import { onboarding } from "@/constants";
+import { CustomButton } from "@/components/CustomButton";
 const Onboarding = () => {
+  const swiperRef = useRef<Swiper>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const isLastSlide = onboarding.length - 1 === activeIndex;
   return (
-    <SafeAreaView className={"m-auto"}>
-      <Text
-        className={
-          "flex justify-center m-auto text-xl text-red-500 align-middle"
-        }
+    <SafeAreaView className={"flex h-full justify-between items-center"}>
+      <TouchableOpacity
+        className={"w-full flex justify-end items-end p-5"}
+        onPress={() => router.replace("/(auth)/sign-up")}
       >
-        onboarding
-      </Text>
+        <Text className={"text-black text-md font-JakartaBold"}>skip</Text>
+      </TouchableOpacity>
+      <Swiper
+        loop={false}
+        dot={
+          <View className="w-[32px] h-[4px] mx-1 bg-[#E2E8F0] rounded-full" />
+        }
+        activeDot={
+          <View className="w-[32px] h-[4px] mx-1 bg-[#0286ff] rounded-full" />
+        }
+        ref={swiperRef}
+        onIndexChanged={(index) => setActiveIndex(index)}
+      >
+        {onboarding.map((item, index) => (
+          <View key={item.id} className={"flex items-center p-5"}>
+            <Image
+              source={item.image}
+              className={"w-full h-[300px]"}
+              resizeMode={"contain"}
+            />
+            <View className={"flex flex-row items-center justify-center"}>
+              <Text
+                className={"text-black text-3xl font-bold mx-10 text-center"}
+              >
+                {item.title}
+              </Text>
+            </View>
+            <Text
+              className={
+                "text-lg mx-10 mt-3 font-JakartaSemiBold font-bold text-center text-[#858585]"
+              }
+            >
+              {item.description}
+            </Text>
+          </View>
+        ))}
+      </Swiper>
+      <CustomButton
+        onPress={() =>
+          (isLastSlide && router.replace("/(auth)/sign-up")) ||
+          swiperRef?.current?.scrollBy(1)
+        }
+        className={"w-11/12 mt-10"}
+        title={(isLastSlide && "Get Started") || "Next"}
+      />
     </SafeAreaView>
   );
 };
